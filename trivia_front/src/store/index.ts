@@ -39,7 +39,7 @@ const mutations: MutationTree<State> & Mutations = {
       "Content-Type": "application/json",
       Authorization: `JWT ${payload}`
     }
-    axios.get("api/myprofile/", {
+    axios.get("/api/myprofile/", {
       headers: headers
     }).then((res) => {
       state.userId = res.data[0].id
@@ -78,7 +78,7 @@ export const actions: ActionTree<State, State> & Actions = {
   // login action
   [ActionTypes.LOGIN]({ commit }, data) {
     return new Promise((resolve, reject) => {
-      axios.post("authen/jwt/create", data).then((res) => {
+      axios.post("/authen/jwt/create", data).then((res) => {
         commit(MutationTypes.LOGIN, res.data.access)
         resolve(res.data.access)
       }).catch((err) => {
@@ -93,7 +93,7 @@ export const actions: ActionTree<State, State> & Actions = {
       "Content-Type": "application/json",
       Authorization: `JWT ${state.jwt}`
     }
-    axios.get("api/goods/", {
+    axios.get("/api/goods/", {
       headers: headers
     }).then((res) => {
       commit(MutationTypes.GOOD, res.data)

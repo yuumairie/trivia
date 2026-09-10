@@ -46,7 +46,7 @@ export default defineComponent({
       return store.getters.getToken;
     });
     onMounted(() => {
-      axios.get("api/genres/").then((req) => {
+      axios.get("/api/genres/").then((req) => {
         state.genreList = req.data;
       });
     });
@@ -63,7 +63,7 @@ export default defineComponent({
       };
 
       axios
-        .post("api/trivias/", data, {
+        .post("/api/trivias/", data, {
           headers: headers,
         })
         .then((req) => {

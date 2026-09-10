@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 from datetime import timedelta
 
@@ -24,9 +25,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'tiqo@)=ve0a6dwdey(urs_lgdnz(=l8hbkvbke#kc2xi7t8i9o'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get(
+    'DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,backend'
+).split(',')
 
 
 # Application definition
@@ -104,16 +107,27 @@ SIMPLE_JWT = {
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'aws-and-infra',
-        'USER': 'aws-and-infra',
-        'PASSWORD': 'password',
-        'HOST': 'aws-and-infra-web.chs0umzgx9dz.ap-northeast-1.rds.amazonaws.com',
-        'PORT': '3306',
+# Local Docker dev defaults to sqlite so `docker compose up` works with no
+# extra services. Set DB_ENGINE=mysql (+ DB_NAME/DB_USER/DB_PASSWORD/DB_HOST/
+# DB_PORT) to point at a real MySQL instance instead (e.g. production RDS).
+if os.environ.get('DB_ENGINE') == 'mysql':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ.get('DB_NAME', 'trivia'),
+            'USER': os.environ.get('DB_USER', 'trivia'),
+            'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+            'HOST': os.environ.get('DB_HOST', 'db'),
+            'PORT': os.environ.get('DB_PORT', '3306'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation

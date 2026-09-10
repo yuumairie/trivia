@@ -50,7 +50,7 @@ export default defineComponent({
       return store.getters.getToken;
     });
     onMounted(() => {
-      axios.get("api/genres/").then((req) => {
+      axios.get("/api/genres/").then((req) => {
         state.genreList = req.data;
       });
       axios

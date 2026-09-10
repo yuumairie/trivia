@@ -64,14 +64,14 @@ export default defineComponent({
     });
 
     function getTriviaList(): void {
-      axios.get("api/trivias/").then((req) => {
+      axios.get("/api/trivias/").then((req) => {
         state.triviaList = req.data;
       });
     }
 
     onMounted(() => {
       getTriviaList();
-      axios.get("api/genres/").then((req) => {
+      axios.get("/api/genres/").then((req) => {
         state.genreList = req.data;
       });
     });
