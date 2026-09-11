@@ -1,0 +1,17 @@
+{
+  "name": "trivia (backend + frontend)",
+  "dockerComposeFile": ["../docker-compose.yml"],
+  "service": "dev",
+  "workspaceFolder": "/workspace",
+  "shutdownAction": "none",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "Vue.volar",
+        "dbaeumer.vscode-eslint"
+      ]
+    }
+  }
+}

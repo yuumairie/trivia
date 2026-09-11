@@ -10,7 +10,7 @@
 | `trivia_front` | フロントエンド | Vue.js 3 / TypeScript / Vuex / Vue Router |
 | `trivia_api` | API仕様書 | OpenAPI 3.0（参考資料、単体では動作しません） |
 
-`docker-compose.yml` は `trivia_server` と `trivia_front` の2コンテナをまとめて起動します。
+`docker-compose.yml` は `trivia_server` と `trivia_front` を1つのコンテナ（`dev`）にまとめて起動します。バックエンド（ポート8000）とフロントエンド（ポート8080）の開発サーバーが同じコンテナの中で両方動きます。
 
 ## 必要なもの
 
@@ -34,7 +34,7 @@
    docker compose up --build
    ```
 
-   初回はビルドに数分かかります。バックエンドは起動時に自動でマイグレーション（`migrate`）を実行します。
+   初回はPython/Node両方の依存関係をインストールするのでビルドに数分かかります。起動時に自動でバックエンドのマイグレーション（`migrate`）も実行されます。
 
 3. アクセス先
 
@@ -67,38 +67,35 @@ docker compose down
 Django管理画面 (`/admin/`) を使う場合は、コンテナ起動後に一度だけ実行します。
 
 ```
-docker compose exec backend python manage.py createsuperuser
+docker compose exec dev python trivia_server/manage.py createsuperuser
 ```
 
 ## 開発環境：VS Codeでコンテナに接続する方法
 
 このプロジェクトの開発は「`docker compose up` でコンテナを起動 → VS Codeをそのコンテナにアタッチ」というスタイルを想定しています。ソースコードはbind mountでホストと同期しているため、どちらで編集しても即座に反映されます。
 
-`.devcontainer/backend/` と `.devcontainer/frontend/` に設定ファイル（`devcontainer.json`）を用意しており、これを使ってアタッチすると、接続直後に必要な拡張機能が自動でインストールされます。
+コンテナは1つ（`dev`）だけなので、VS Codeのウィンドウも1つで済みます。`trivia_server/` と `trivia_front/` の両方が同じウィンドウのエクスプローラーに表示され、ターミナルを2つ開けば（Django側・Vue側）両方同時に作業できます。
 
 1. `docker compose up`（または `-d`）でコンテナを起動しておく（すでに起動している場合、VS Code側で自動検知してそのまま使われます）
 2. VS Codeに拡張機能「Dev Containers」をインストールする
 3. コマンドパレットを開く（`Cmd+Shift+P` / `Ctrl+Shift+P`）
 4. 「**Dev Containers: Reopen in Container**」（このリポジトリを開いていない場合は「**Dev Containers: Open Folder in Container...**」）を選択する
-5. 複数の設定が見つかるので、触りたい方を選ぶ
-   - バックエンド（Django/Python）を触る場合: `trivia backend (Django)`
-   - フロントエンド（Vue/TypeScript）を触る場合: `trivia frontend (Vue)`
-6. 新しいVS Codeウィンドウがコンテナ内で `/app` を開いた状態で立ち上がり、`devcontainer.json` に列挙された拡張機能（Python/Pylance、Vue.volar、ESLintなど）が自動でインストールされます
+5. VS Codeウィンドウがコンテナ内で `/workspace`（リポジトリ全体）を開いた状態で立ち上がり、`devcontainer.json` に列挙された拡張機能（Python/Pylance、Vue.volar、ESLint）が自動でインストールされます
    - コンテナ内にインストールされているPython/Node、および依存パッケージがそのまま使えます
+   - ターミナルタブを増やして、片方で `cd trivia_server && python manage.py ...`、もう片方で `cd trivia_front && npm run ...` のように使い分けられます
 
 **補足**
 
 - `devcontainer.json` の `shutdownAction` は `none` にしてあるので、VS Codeのウィンドウを閉じてもコンテナは停止しません（`docker compose down` するまで起動したままです）。
-- バックエンドとフロントエンドを同時に編集したい場合は、上記の手順を2回行って2つのウィンドウを開いてください。
-- 入れたい拡張機能を追加・変更したい場合は、`.devcontainer/backend/devcontainer.json` / `.devcontainer/frontend/devcontainer.json` の `customizations.vscode.extensions` に拡張機能IDを追記してください（次回アタッチ時から反映されます）。
-- 上記の設定を使わず、単純にコンテナへアタッチしたいだけの場合は「**Dev Containers: Attach to Running Container...**」から `trivia_backend` / `trivia_frontend` を選ぶことも可能です。ただしこの方法では拡張機能は自動で入らないため、通常は上記の「Reopen in Container」経由を推奨します。
+- 入れたい拡張機能を追加・変更したい場合は、`.devcontainer/devcontainer.json` の `customizations.vscode.extensions` に拡張機能IDを追記してください（次回アタッチ時から反映されます）。
+- 単純にコンテナへアタッチしたいだけの場合は「**Dev Containers: Attach to Running Container...**」から `trivia_dev` を選ぶことも可能です。ただしこの方法では拡張機能は自動で入らないため、通常は上記の「Reopen in Container」経由を推奨します。
 
 ## よく使うコマンド
 
-- ログを確認する: `docker compose logs -f backend`（または `frontend`）
-- コンテナ内でシェルを開く: `docker compose exec backend bash`（または `frontend`）
-- マイグレーションファイルを作成する: `docker compose exec backend python manage.py makemigrations`
-- マイグレーションを適用する: `docker compose exec backend python manage.py migrate`
+- ログを確認する: `docker compose logs -f dev`
+- コンテナ内でシェルを開く: `docker compose exec dev bash`
+- マイグレーションファイルを作成する: `docker compose exec dev python trivia_server/manage.py makemigrations`
+- マイグレーションを適用する: `docker compose exec dev python trivia_server/manage.py migrate`
 - 依存関係を追加した後の再ビルド: `docker compose up --build`
 
 ## データベースについて
