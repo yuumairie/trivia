@@ -5,7 +5,7 @@ from rest_framework.permissions import (
   IsAuthenticatedOrReadOnly,
 )
 from rest_framework import generics
-from .models import Trivia, Genre, Profile, Comment, User, Good
+from .models import Haiku, Profile, Comment, User, Good
 from rest_framework import viewsets
 from . import serializers
 from .ownpermissions import ProfilePermission
@@ -33,12 +33,6 @@ class MyProfileListView(generics.ListAPIView):
     return self.queryset.filter(email=self.request.user)
 
 
-class GenreViewSet(viewsets.ModelViewSet):
-  queryset = Genre.objects.all()
-  serializer_class = serializers.GenreSerializer
-  permission_classes = (AllowAny,)
-
-
 class GoodViewSet(viewsets.ModelViewSet):
   queryset = Good.objects.all()
   serializer_class = serializers.GoodSerializer
@@ -47,14 +41,14 @@ class GoodViewSet(viewsets.ModelViewSet):
   #   return self.queryset.filter(user=self.request.user)
 
 
-class TriviaViewSet(viewsets.ModelViewSet):
+class HaikuViewSet(viewsets.ModelViewSet):
   permission_classes = (IsAuthenticatedOrReadOnly,)
-  queryset = Trivia.objects.all()
+  queryset = Haiku.objects.all()
 
   def get_serializer_class(self):
     if self.request.method == 'GET':
-      return serializers.TriviaReadSerializer
-    return serializers.TriviaWriteSerializer
+      return serializers.HaikuReadSerializer
+    return serializers.HaikuWriteSerializer
 
   def perform_create(self, serializer):
     serializer.save(userPost=self.request.user)

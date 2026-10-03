@@ -1,35 +1,34 @@
 <template>
-  <div class="trivia">
-    <div class="content" @click="clickContent(trivia.id)">
-      <div class="genre">{{ trivia.genre.name }}</div>
+  <div class="haiku">
+    <div class="content" @click="clickContent(haiku.id)">
       <div class="main">
-        {{ trivia.content }}
+        {{ haiku.content }}
       </div>
     </div>
     <div class="footer">
       <div class="user">
-        {{ trivia.userPost.userName ? trivia.userPost.userName : '匿名' }}
+        {{ haiku.userPost.userName ? haiku.userPost.userName : '匿名' }}
       </div>
-      <div class="time">{{ trivia.created_at }}</div>
+      <div class="time">{{ haiku.created_at }}</div>
       <div class="rap">
         <div class="heart" v-if="isNotLoginUser">
           <img
             class="heart-img"
             :src="require('@/assets/images/good.png')"
-            @click="clickGood(false, trivia.id, trivia.good)"
-            v-if="isAlreadyGood(trivia.good)"
+            @click="clickGood(false, haiku.id, haiku.good)"
+            v-if="isAlreadyGood(haiku.good)"
           />
           <img
             class="heart-img"
             :src="require('@/assets/images/normal.png')"
-            @click="clickGood(true, trivia.id)"
+            @click="clickGood(true, haiku.id)"
             v-else
           />
         </div>
       </div>
       <div>
         <p class="good">good</p>
-        <div class="count">{{ trivia.good.length }}</div>
+        <div class="count">{{ haiku.good.length }}</div>
       </div>
     </div>
   </div>
@@ -40,18 +39,18 @@ import { defineComponent, computed, reactive } from 'vue';
 import { useRouter } from '../router';
 import { ActionTypes, useStore } from '../store';
 import axios from 'axios';
-import { TriviaModel, UserModel, GoodModel } from '../types/task.d';
+import { UserModel, GoodModel } from '../types/task.d';
 
 export default defineComponent({
-  name: 'TrivaiCard',
+  name: 'HaikuCard',
   props: {
-    trivia: {
+    haiku: {
       type: Object,
       required: true,
     },
     isNotLoginUser: Boolean,
   },
-  emits: ['get-trivia-list'],
+  emits: ['get-haiku-list'],
   setup(props, { emit }) {
     const router = useRouter();
     const store = useStore();
@@ -73,9 +72,9 @@ export default defineComponent({
       });
     };
 
-    const getMyGood = (userId: string, triviaId: string): number => {
+    const getMyGood = (userId: string, haikuId: string): number => {
       const good: GoodModel | undefined = goodList.value.find((good) => {
-        return good.user === userId && good.trivia === triviaId;
+        return good.user === userId && good.haiku === haikuId;
       });
       if (good) {
         return good.id;
@@ -86,7 +85,7 @@ export default defineComponent({
     const clickGood = (isGood: boolean, id: string, goodUserList?: Array<UserModel>): void => {
       const data = {
         user: state.userId,
-        trivia: id,
+        haiku: id,
       };
       const headers = {
         'Content-Type': 'application/json',
@@ -100,7 +99,7 @@ export default defineComponent({
           .then((resp) => {
             //ユーザのいいね一覧取得
             store.dispatch(ActionTypes.GOOD);
-            emit('get-trivia-list');
+            emit('get-haiku-list');
           })
           .catch((err) => {
             console.error(err);
@@ -113,7 +112,7 @@ export default defineComponent({
           .then((resp) => {
             //ユーザのいいね一覧取得
             store.dispatch(ActionTypes.GOOD);
-            emit('get-trivia-list');
+            emit('get-haiku-list');
           })
           .catch((err) => {
             console.error(err);
@@ -126,7 +125,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.trivia {
+.haiku {
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.16);
   border: solid black 1px;
   width: 320px;
@@ -137,21 +136,17 @@ export default defineComponent({
   border-radius: 0 0 25px 25px;
   height: 47px;
 }
-.trivia .user {
+.haiku .user {
   position: relative;
   left: 50px;
   top: 11px;
 }
-.trivia .genre {
-  text-align: left;
-  padding: 7px 0 0 6px;
-}
-.trivia .time {
+.haiku .time {
   position: relative;
   bottom: 13px;
   left: 140px;
 }
-.trivia .content {
+.haiku .content {
   text-align: center;
   cursor: pointer;
   overflow: hidden;

@@ -1,5 +1,5 @@
 {
-  "name": "trivia (backend + frontend)",
+  "name": "haiku (backend + frontend)",
   "dockerComposeFile": ["../docker-compose.yml"],
   "service": "dev",
   "workspaceFolder": "/workspace",

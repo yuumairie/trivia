@@ -20,10 +20,10 @@ fi
 # 2行のコメントアウトを外して、この行(tail -f /dev/null)を削除・コメントアウトする。
 
 # # Backend: migrate then run the dev server in the background.
-# (cd trivia_server && python manage.py migrate --noinput && exec python manage.py runserver 0.0.0.0:8000) &
+# (cd haiku_server && python manage.py migrate --noinput && exec python manage.py runserver 0.0.0.0:8000) &
 
 # # Frontend: run the dev server in the foreground so the container's
 # # main process stays attached to it.
-# cd trivia_front && exec npm run serve -- --host 0.0.0.0 --port 8080
+# cd haiku_front && exec npm run serve -- --host 0.0.0.0 --port 8080
 
 exec tail -f /dev/null

@@ -1,8 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import (
-  AbstractBaseUser,
-  BaseUserManager,
-  PermissionsMixin,
+    AbstractBaseUser,
+    BaseUserManager,
+    PermissionsMixin,
 )
 from django.conf import settings
 
@@ -24,7 +24,7 @@ class UserManager(BaseUserManager):
       raise ValueError('email is must')
 
     user = self.model(
-      email=self.normalize_email(email), username=username, **extra_fields
+        email=self.normalize_email(email), username=username, **extra_fields
     )
     user.set_password(password)
     user.save(using=self._db)
@@ -55,7 +55,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Profile(models.Model):
   nickName = models.CharField(max_length=20)
   userProfile = models.OneToOneField(
-    settings.AUTH_USER_MODEL, related_name='userProfile', on_delete=models.CASCADE
+      settings.AUTH_USER_MODEL, related_name='userProfile', on_delete=models.CASCADE
   )
   created_on = models.DateTimeField(auto_now_add=True)
   img = models.ImageField(blank=True, null=True, upload_to=upload_avatar_path)
@@ -64,21 +64,11 @@ class Profile(models.Model):
     return self.nickName
 
 
-class Genre(models.Model):
-  name = models.CharField(max_length=25)
-  created_at = models.DateTimeField(auto_now_add=True)
-
-  def __str__(self):
-    return self.name
-
-
-class Trivia(models.Model):
+class Haiku(models.Model):
   userPost = models.ForeignKey(
-    settings.AUTH_USER_MODEL, related_name='userPost', on_delete=models.CASCADE
+      settings.AUTH_USER_MODEL, related_name='userPost', on_delete=models.CASCADE
   )
-  genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
   content = models.CharField(max_length=50)
-  explanation = models.CharField(max_length=255, blank=True)
   good = models.ManyToManyField(settings.AUTH_USER_MODEL, through='Good')
   created_at = models.DateTimeField(auto_now_add=True)
 
@@ -86,9 +76,9 @@ class Trivia(models.Model):
 class Comment(models.Model):
   text = models.CharField(max_length=100)
   userComment = models.ForeignKey(
-    settings.AUTH_USER_MODEL, related_name='userComment', on_delete=models.CASCADE
+      settings.AUTH_USER_MODEL, related_name='userComment', on_delete=models.CASCADE
   )
-  post = models.ForeignKey(Trivia, on_delete=models.CASCADE)
+  post = models.ForeignKey(Haiku, on_delete=models.CASCADE)
 
   def __str__(self):
     return self.text
@@ -96,15 +86,15 @@ class Comment(models.Model):
 
 class Good(models.Model):
   user = models.ForeignKey(
-    settings.AUTH_USER_MODEL,
-    on_delete=models.CASCADE,
-    related_name='user_relationships',
+      settings.AUTH_USER_MODEL,
+      on_delete=models.CASCADE,
+      related_name='user_relationships',
   )
-  trivia = models.ForeignKey(
-    Trivia, on_delete=models.CASCADE, related_name='trivia_relationships'
+  haiku = models.ForeignKey(
+      Haiku, on_delete=models.CASCADE, related_name='haiku_relationships'
   )
 
   class Meta:
     constraints = [
-      models.UniqueConstraint(fields=['user', 'trivia'], name='unique_set')
+        models.UniqueConstraint(fields=['user', 'haiku'], name='unique_set')
     ]

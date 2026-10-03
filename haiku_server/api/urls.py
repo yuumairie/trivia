@@ -3,8 +3,7 @@ from rest_framework import routers
 from . import views
 
 router = routers.DefaultRouter()
-router.register('genres', views.GenreViewSet)
-router.register('trivias', views.TriviaViewSet)
+router.register('haikus', views.HaikuViewSet)
 router.register('profiles', views.ProfileViewSet)
 router.register('comments', views.CommentViewSet)
 router.register('goods', views.GoodViewSet)

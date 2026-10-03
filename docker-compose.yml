@@ -2,13 +2,13 @@ services:
   dev:
     build:
       context: .
-    container_name: trivia_dev
+    container_name: haiku_dev
     ports:
       - "8000:8000"
       - "8080:8080"
     volumes:
       - .:/workspace
-      - frontend_node_modules:/workspace/trivia_front/node_modules
+      - frontend_node_modules:/workspace/haiku_front/node_modules
       # Macの git 設定とSSH鍵を読み取り専用で共有し、コンテナ内のgitで
       # そのままpush/pullできるようにする。.gitconfig-host は
       # entrypoint.shが読み込んで /root/.gitconfig を生成する際に使う。
@@ -23,13 +23,13 @@ services:
   # MySQLサーバーをインストールする必要はない。
   db:
     image: mysql:8.0
-    container_name: trivia_db
+    container_name: haiku_db
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: trivia
-      MYSQL_USER: trivia
-      MYSQL_PASSWORD: trivia
-      MYSQL_ROOT_PASSWORD: trivia
+      MYSQL_DATABASE: haiku
+      MYSQL_USER: haiku
+      MYSQL_PASSWORD: haiku
+      MYSQL_ROOT_PASSWORD: haiku
     ports:
       - "3306:3306"
     volumes:

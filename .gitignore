@@ -13,13 +13,13 @@
 *.sln
 *.sw?
 
-# Python (trivia_server)
+# Python (haiku_server)
 __pycache__/
 *.py[cod]
 
-# Node / Vue (trivia_front)
+# Node / Vue (haiku_front)
 node_modules/
-/trivia_front/dist
+/haiku_front/dist
 .env.local
 .env.*.local
 npm-debug.log*

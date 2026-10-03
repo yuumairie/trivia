@@ -19,6 +19,8 @@ WORKDIR /workspace
 # 補足: 以前、apt-getで新規パッケージを入れようとするとdpkgの展開処理自体が
 # 落ちるというビルド環境固有の問題が見つかっていた(このDockerfileで他の依存を
 # apt-getではなくマルチステージのCOPYで入れているのはそのため)。もしここで
+# ビルドが失敗する場合は、同じくマルチステージCOPYでgitバイナリを持ってくる方式に
+# 切り替える必要があるので報告してください。
 RUN apt-get update && \
     apt-get install -y --no-install-recommends git openssh-client && \
     rm -rf /var/lib/apt/lists/*
@@ -29,10 +31,10 @@ RUN apt-get update && \
 # Cコンパイラやapt側のパッケージ(build-essential, libjpeg-dev, zlib1g-dev)は不要。
 # --progress-bar off: このビルド環境は新しいスレッドを作成できず、pipの標準の
 # 進捗バー表示がクラッシュしてしまうため無効化している。
-COPY trivia_server/requirements.txt trivia_server/requirements-dev.txt trivia_server/
+COPY haiku_server/requirements.txt haiku_server/requirements-dev.txt haiku_server/
 RUN pip install --no-cache-dir --progress-bar off \
-      -r trivia_server/requirements.txt \
-      -r trivia_server/requirements-dev.txt
+      -r haiku_server/requirements.txt \
+      -r haiku_server/requirements-dev.txt
 
 # フロントエンドの依存パッケージ。package-lock.json内の"resolved"のURLは、
 # 元々使われていた中国のnpmミラー(registry.npm.taobao.org、TLS証明書が期限切れ)
@@ -40,8 +42,8 @@ RUN pip install --no-cache-dir --progress-bar off \
 # --legacy-peer-deps: 未使用だったvue-cli-plugin-vuetify(Vue 2向けのpeer依存を
 # 宣言していた)は削除済みだが、@vue/cli-plugin-*系(4.5系)のpeer依存の範囲が
 # 新しいTypeScript/Vueに追従しきれていないため、念のため引き続き付けている。
-COPY trivia_front/package.json trivia_front/package-lock.json trivia_front/
-RUN cd trivia_front && npm install --no-progress --legacy-peer-deps
+COPY haiku_front/package.json haiku_front/package-lock.json haiku_front/
+RUN cd haiku_front && npm install --no-progress --legacy-peer-deps
 
 COPY . .
 

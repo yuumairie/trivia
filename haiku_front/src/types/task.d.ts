@@ -3,29 +3,19 @@ export interface UserModel {
   username: string;
 }
 
-export interface GenreModel {
-  id: number;
-  name: string;
-}
-
-export interface TriviaModel {
+export interface HaikuModel {
   id: number;
   userPost: {
     id: number;
     username: string;
   };
-  genre: {
-    id: number;
-    name: string;
-  };
   content?: string;
   created_at?: string;
-  explanation?: string;
   good?: Array<UserModel>;
 }
 
 export interface GoodModel {
   id: number;
   user: string;
-  trivia: string;
+  haiku: string;
 }
