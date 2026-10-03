@@ -2,51 +2,40 @@
   <div class="root">
     <header id="nav">
       <h1 class="nav-bar" @click="goToHome()">
-        <img
-          style="height:20px"
-          :src="require('@/assets/images/クラーケン.png')"
-        />Uknown<img
-          style="height:20px"
+        <img style="height: 20px" :src="require('@/assets/images/クラーケン.png')" />Uknown<img
+          style="height: 20px"
           :src="require('@/assets/images/ギャング.png')"
         />
       </h1>
       <div class="icons">
         <router-link to="/register">
           <div class="icon">
-            <img
-              style="height:20px"
-              :src="require('@/assets/images/登録.png')"
-            />
+            <img style="height: 20px" :src="require('@/assets/images/登録.png')" />
             新規登録
           </div></router-link
         >
         <router-link to="/login">
           <div class="icon">
-            <img
-              style="height:20px"
-              :src="require('@/assets/images/ログイン.png')"
-            />
+            <img style="height: 20px" :src="require('@/assets/images/ログイン.png')" />
             ログイン
           </div></router-link
         >
       </div>
     </header>
     <router-view />
-    <div class="footer">
-      Copyright © 2020 Inc. Co., Ltd., All Rights Unreserved.
-    </div>
+    <div class="footer">Copyright © 2020 Inc. Co., Ltd., All Rights Unreserved.</div>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent } from "vue";
-import { useRouter } from "../src/router";
+import { defineComponent } from 'vue';
+import { useRouter } from '../src/router';
 
 export default defineComponent({
   setup() {
-    function goToHome() {
+    const goToHome = () => {
       const router = useRouter();
-      router.push("/home");
-    }
+      router.push('/home');
+    };
     return { goToHome };
   },
 });
@@ -65,7 +54,7 @@ export default defineComponent({
   color: black;
   text-align: left;
   height: 90px;
-  background-image: url("../src/assets/images/brain-2029391_1280.png");
+  background-image: url('../src/assets/images/brain-2029391_1280.png');
   width: 100%;
   margin: 0;
   top: 0;

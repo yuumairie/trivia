@@ -5,12 +5,9 @@
     </div>
     <div class="search">
       <select id="genre" v-model="state.genreId">
-        <option
-          v-for="genre in state.genreList"
-          :key="genre.id"
-          :value="genre.id"
-          >{{ genre.name }}</option
-        >
+        <option v-for="genre in state.genreList" :key="genre.id" :value="genre.id">
+          {{ genre.name }}
+        </option>
       </select>
       <img
         class="glasses"
@@ -20,7 +17,7 @@
       />
     </div>
     <div class="cards">
-      <div v-for="trivia in triviaOnSearch" :key="trivia">
+      <div v-for="trivia in triviaOnSearch" :key="trivia.id">
         <Trivia-Card
           :trivia="trivia"
           :isNotLoginUser="isNotLoginUser(trivia.userPost.id)"
@@ -32,22 +29,22 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, computed } from "vue";
-import axios from "axios";
-import TriviaCard from "../components/TriviaCard.vue";
-import { useStore } from "../store";
-import { useRouter } from "../router";
-import { TriviaModel } from "../types/task";
+import { defineComponent, onMounted, reactive, computed } from 'vue';
+import axios from 'axios';
+import TriviaCard from '../components/TriviaCard.vue';
+import { useStore } from '../store';
+import { useRouter } from '../router';
+import { TriviaModel, GenreModel } from '../types/task';
 export default defineComponent({
-  name: "home",
+  name: 'home',
   components: {
     TriviaCard,
   },
   setup() {
     const store = useStore();
     const state = reactive({
-      triviaList: [],
-      genreList: [],
+      triviaList: [] as TriviaModel[],
+      genreList: [] as GenreModel[],
       genre: 0,
       genreId: 0,
     });
@@ -63,29 +60,39 @@ export default defineComponent({
       return state.triviaList;
     });
 
-    function getTriviaList(): void {
-      axios.get("/api/trivias/").then((req) => {
-        state.triviaList = req.data;
-      });
-    }
+    const getTriviaList = (): void => {
+      axios
+        .get('/api/trivias/')
+        .then((req) => {
+          state.triviaList = req.data;
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    };
 
     onMounted(() => {
       getTriviaList();
-      axios.get("/api/genres/").then((req) => {
-        state.genreList = req.data;
-      });
+      axios
+        .get('/api/genres/')
+        .then((req) => {
+          state.genreList = req.data;
+        })
+        .catch((err) => {
+          console.error(err);
+        });
     });
-    function search(): void {
+    const search = (): void => {
       state.genre = state.genreId;
-    }
-    function isNotLoginUser(id: number): boolean {
+    };
+    const isNotLoginUser = (id: number): boolean => {
       if (jwt.value) {
         return store.getters.getUserId !== id;
       }
       return false;
-    }
+    };
 
-    return { state, jwt, search, triviaOnSearch, isNotLoginUser ,getTriviaList};
+    return { state, jwt, search, triviaOnSearch, isNotLoginUser, getTriviaList };
   },
 });
 </script>

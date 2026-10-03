@@ -1,27 +1,47 @@
-# Single dev container with both the Python/Django backend and the
-# Node/Vue frontend toolchains, so one VS Code window (one container)
-# can edit and run both trivia_server and trivia_front.
+# バックエンド(Python/Django)とフロントエンド(Node/Vue)の両方を1つのコンテナに
+# まとめた開発用Dockerfile。VS Codeのウィンドウを1つだけ開けば両方を編集・実行できる。
+
+# Node.jsは公式イメージからマルチステージビルドでコピーしている(apt-get/NodeSource
+# ではインストールしない)。このプロジェクトのビルド環境ではapt-getで何か新しい
+# パッケージを入れようとすると、dpkgのパッケージ展開処理自体が毎回落ちてしまう
+# 問題があったため、apt-getを一切使わない構成にして回避している。
+FROM node:16-bookworm-slim AS node_base
+
 FROM python:3.8-slim
 
-# --- Node.js 16.x (matches what trivia_front was built/tested against) ---
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl gnupg build-essential libjpeg-dev zlib1g-dev \
-    && curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
-    && apt-get install -y --no-install-recommends nodejs \
-    && rm -rf /var/lib/apt/lists/*
+COPY --from=node_base /usr/local /usr/local
 
 WORKDIR /workspace
 
-# Pre-install backend deps (kept separate from the bind mount so a
-# `docker compose up --build` doesn't need to reinstall every time the
-# source changes).
-COPY trivia_server/requirements.txt trivia_server/requirements.txt
-RUN pip install --no-cache-dir -r trivia_server/requirements.txt
+# git / openssh-client: コンテナ内でgitコマンドを使うために必要。
+# このイメージ(python:3.8-slim)にはデフォルトで含まれていないため、apt-getで
+# インストールする。
+# 補足: 以前、apt-getで新規パッケージを入れようとするとdpkgの展開処理自体が
+# 落ちるというビルド環境固有の問題が見つかっていた(このDockerfileで他の依存を
+# apt-getではなくマルチステージのCOPYで入れているのはそのため)。もしここで
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends git openssh-client && \
+    rm -rf /var/lib/apt/lists/*
 
-# Pre-install frontend deps into the image; the node_modules volume in
-# docker-compose.yml keeps this from being hidden by the bind mount.
+# バックエンドの依存パッケージ。bind mountとは別にここでインストールしておくことで、
+# requirements.txtが変わらない限り再ビルド時にpip installをやり直さずに済む。
+# ここに書かれているパッケージは全てビルド済みのmanylinux wheelが存在するため、
+# Cコンパイラやapt側のパッケージ(build-essential, libjpeg-dev, zlib1g-dev)は不要。
+# --progress-bar off: このビルド環境は新しいスレッドを作成できず、pipの標準の
+# 進捗バー表示がクラッシュしてしまうため無効化している。
+COPY trivia_server/requirements.txt trivia_server/requirements-dev.txt trivia_server/
+RUN pip install --no-cache-dir --progress-bar off \
+      -r trivia_server/requirements.txt \
+      -r trivia_server/requirements-dev.txt
+
+# フロントエンドの依存パッケージ。package-lock.json内の"resolved"のURLは、
+# 元々使われていた中国のnpmミラー(registry.npm.taobao.org、TLS証明書が期限切れ)
+# から、同じバージョン・内容のまま本家registry.npmjs.orgのURLに書き換え済み。
+# --legacy-peer-deps: 未使用だったvue-cli-plugin-vuetify(Vue 2向けのpeer依存を
+# 宣言していた)は削除済みだが、@vue/cli-plugin-*系(4.5系)のpeer依存の範囲が
+# 新しいTypeScript/Vueに追従しきれていないため、念のため引き続き付けている。
 COPY trivia_front/package.json trivia_front/package-lock.json trivia_front/
-RUN cd trivia_front && npm install
+RUN cd trivia_front && npm install --no-progress --legacy-peer-deps
 
 COPY . .
 

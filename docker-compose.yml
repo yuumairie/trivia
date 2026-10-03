@@ -9,8 +9,32 @@ services:
     volumes:
       - .:/workspace
       - frontend_node_modules:/workspace/trivia_front/node_modules
+      # Macの git 設定とSSH鍵を読み取り専用で共有し、コンテナ内のgitで
+      # そのままpush/pullできるようにする。.gitconfig-host は
+      # entrypoint.shが読み込んで /root/.gitconfig を生成する際に使う。
+      - ${HOME}/.gitconfig:/root/.gitconfig-host:ro
+      - ${HOME}/.ssh:/root/.ssh:ro
     env_file:
       - .env
+    depends_on:
+      - db
+
+  # アプリが使うMySQL本体。公式イメージをそのまま使うので、Dockerfile側で
+  # MySQLサーバーをインストールする必要はない。
+  db:
+    image: mysql:8.0
+    container_name: trivia_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: trivia
+      MYSQL_USER: trivia
+      MYSQL_PASSWORD: trivia
+      MYSQL_ROOT_PASSWORD: trivia
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
 
 volumes:
   frontend_node_modules:
+  mysql_data:

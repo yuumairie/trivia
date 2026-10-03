@@ -1,0 +1,12 @@
+# Lint/format-only tools, not needed to run the app. Install with:
+#   pip install -r requirements.txt -r requirements-dev.txt
+astroid==2.4.2
+autopep8==2.0.4
+isort==5.4.2
+lazy-object-proxy==1.4.3
+mccabe==0.6.1
+pylint==2.6.0
+pylint-django==2.3.0
+pylint-plugin-utils==0.6
+toml==0.10.1
+wrapt==1.12.1

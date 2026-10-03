@@ -22,42 +22,46 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'tiqo@)=ve0a6dwdey(urs_lgdnz(=l8hbkvbke#kc2xi7t8i9o'
+# Reads from DJANGO_SECRET_KEY (.env). The fallback below is only for local
+# dev convenience and must be overridden with a real secret in production.
+SECRET_KEY = os.environ.get(
+  'DJANGO_SECRET_KEY', 'tiqo@)=ve0a6dwdey(urs_lgdnz(=l8hbkvbke#kc2xi7t8i9o'
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = os.environ.get(
-    'DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,backend'
+  'DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,backend'
 ).split(',')
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'api.apps.ApiConfig',
-    'rest_framework',
-    'rest_framework.authtoken',
-    'corsheaders',
-    'djoser',
-    'django_filters',
+  'django.contrib.admin',
+  'django.contrib.auth',
+  'django.contrib.contenttypes',
+  'django.contrib.sessions',
+  'django.contrib.messages',
+  'django.contrib.staticfiles',
+  'api.apps.ApiConfig',
+  'rest_framework',
+  'rest_framework.authtoken',
+  'corsheaders',
+  'djoser',
+  'django_filters',
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware'
+  'django.middleware.security.SecurityMiddleware',
+  'django.contrib.sessions.middleware.SessionMiddleware',
+  'django.middleware.common.CommonMiddleware',
+  'django.middleware.csrf.CsrfViewMiddleware',
+  'django.contrib.auth.middleware.AuthenticationMiddleware',
+  'django.contrib.messages.middleware.MessageMiddleware',
+  'django.middleware.clickjacking.XFrameOptionsMiddleware',
+  'corsheaders.middleware.CorsMiddleware',
 ]
 
 # CORS_ORIGIN_WHITELIST = [
@@ -65,87 +69,80 @@ MIDDLEWARE = [
 #     'http://10.84.37.15:8080',
 #     'http://192.168.3.12:8080',
 # ]
-CORS_ORIGIN_ALLOW_ALL = True
+# Defaults to allowing all origins for local dev convenience. Set
+# DJANGO_CORS_ALLOW_ALL=False (and configure CORS_ORIGIN_WHITELIST above)
+# for anything closer to production.
+CORS_ORIGIN_ALLOW_ALL = os.environ.get('DJANGO_CORS_ALLOW_ALL', 'True') == 'True'
 
 ROOT_URLCONF = 'drfapi.urls'
 
 TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
+  {
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'DIRS': [],
+    'APP_DIRS': True,
+    'OPTIONS': {
+      'context_processors': [
+        'django.template.context_processors.debug',
+        'django.template.context_processors.request',
+        'django.contrib.auth.context_processors.auth',
+        'django.contrib.messages.context_processors.messages',
+      ],
     },
+  },
 ]
 
 WSGI_APPLICATION = 'drfapi.wsgi.application'
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES':[
-        'rest_framework.permissions.IsAuthenticated',
-    ],
-    'DEFAULT_AUTHENTICATION_CLASSES':[
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
-    'DEFAULT_FILTER_BACKENDS': [
-        'django_filters.rest_framework.DjangoFilterBackend'
-    ]
+  'DEFAULT_PERMISSION_CLASSES': [
+    'rest_framework.permissions.IsAuthenticated',
+  ],
+  'DEFAULT_AUTHENTICATION_CLASSES': [
+    'rest_framework_simplejwt.authentication.JWTAuthentication',
+  ],
+  'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
 
 SIMPLE_JWT = {
-    'AUTH_HEADER_TYPES':('JWT',),
-    'ACCESS_TOKEN_LIFETIME':timedelta(minutes=60),
+  'AUTH_HEADER_TYPES': ('JWT',),
+  'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
 }
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-# Local Docker dev defaults to sqlite so `docker compose up` works with no
-# extra services. Set DB_ENGINE=mysql (+ DB_NAME/DB_USER/DB_PASSWORD/DB_HOST/
-# DB_PORT) to point at a real MySQL instance instead (e.g. production RDS).
-if os.environ.get('DB_ENGINE') == 'mysql':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.environ.get('DB_NAME', 'trivia'),
-            'USER': os.environ.get('DB_USER', 'trivia'),
-            'PASSWORD': os.environ.get('DB_PASSWORD', ''),
-            'HOST': os.environ.get('DB_HOST', 'db'),
-            'PORT': os.environ.get('DB_PORT', '3306'),
-        }
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+# MySQL only (local dev uses the docker-compose "db" service by default;
+# override DB_HOST/DB_PORT/DB_NAME/DB_USER/DB_PASSWORD in .env to point at a
+# real instance instead, e.g. production RDS).
+DATABASES = {
+  'default': {
+    'ENGINE': 'django.db.backends.mysql',
+    'NAME': os.environ.get('DB_NAME', 'trivia'),
+    'USER': os.environ.get('DB_USER', 'trivia'),
+    'PASSWORD': os.environ.get('DB_PASSWORD', 'trivia'),
+    'HOST': os.environ.get('DB_HOST', 'db'),
+    'PORT': os.environ.get('DB_PORT', '3306'),
+  }
+}
 
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+  {
+    'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+  },
+  {
+    'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+  },
+  {
+    'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+  },
+  {
+    'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+  },
 ]
 
 
@@ -168,5 +165,5 @@ AUTH_USER_MODEL = 'api.User'
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-MEDIA_ROOT = Path.joinpath(BASE_DIR,'media')
+MEDIA_ROOT = Path.joinpath(BASE_DIR, 'media')
 MEDIA_URL = '/media/'

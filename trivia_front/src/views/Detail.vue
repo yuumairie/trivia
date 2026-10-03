@@ -2,27 +2,23 @@
   <div class="detail-page">
     <h1>No.{{ state.trivia.id }} {{ state.trivia.content }}</h1>
     <div class="explanation">
-      {{ state.trivia.explanation ? state.trivia.explanation : "説明なし" }}
+      {{ state.trivia.explanation ? state.trivia.explanation : '説明なし' }}
     </div>
-    <div
-      class="edit"
-      v-if="state.trivia.userPost.id === userId"
-      @click="edit()"
-    >
+    <div class="edit" v-if="state.trivia.userPost.id === userId" @click="edit()">
       <img :src="require('@/assets/images/edit.png')" alt="編集" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, computed, PropType } from "vue";
-import axios from "axios";
-import { useStore } from "../store";
-import { useRouter } from "../router";
-import { TriviaModel } from "../types/task";
+import { defineComponent, onMounted, reactive, computed, PropType } from 'vue';
+import axios from 'axios';
+import { useStore } from '../store';
+import { useRouter } from '../router';
+import { TriviaModel } from '../types/task';
 
 export default defineComponent({
-  name: "detail",
+  name: 'detail',
   setup() {
     const store = useStore();
     const router = useRouter();
@@ -55,11 +51,14 @@ export default defineComponent({
         .get(`api/trivias/${router.currentRoute.value.params.id}/`)
         .then((req) => {
           state.trivia = req.data;
+        })
+        .catch((err) => {
+          console.error(err);
         });
     });
-    function edit() {
+    const edit = () => {
       router.push(`/edit/${router.currentRoute.value.params.id}`);
-    }
+    };
 
     return { state, jwt, userId, edit };
   },

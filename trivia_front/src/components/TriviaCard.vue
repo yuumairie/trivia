@@ -8,7 +8,7 @@
     </div>
     <div class="footer">
       <div class="user">
-        {{ trivia.userPost.userName ? trivia.userPost.userName : "匿名" }}
+        {{ trivia.userPost.userName ? trivia.userPost.userName : '匿名' }}
       </div>
       <div class="time">{{ trivia.created_at }}</div>
       <div class="rap">
@@ -36,14 +36,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, reactive } from "vue";
-import { useRouter } from "../router";
-import { ActionTypes, useStore } from "../store";
-import axios from "axios";
-import { TriviaModel, UserModel, GoodModel } from "../types/task.d";
+import { defineComponent, computed, reactive } from 'vue';
+import { useRouter } from '../router';
+import { ActionTypes, useStore } from '../store';
+import axios from 'axios';
+import { TriviaModel, UserModel, GoodModel } from '../types/task.d';
 
 export default defineComponent({
-  name: "TrivaiCard",
+  name: 'TrivaiCard',
   props: {
     trivia: {
       type: Object,
@@ -51,7 +51,7 @@ export default defineComponent({
     },
     isNotLoginUser: Boolean,
   },
-  emits: ["get-trivia-list"],
+  emits: ['get-trivia-list'],
   setup(props, { emit }) {
     const router = useRouter();
     const store = useStore();
@@ -63,17 +63,17 @@ export default defineComponent({
       return store.getters.getGoodList;
     });
 
-    function clickContent(id: number) {
+    const clickContent = (id: number) => {
       router.push(`/detail/${id}`);
-    }
+    };
 
-    function isAlreadyGood(goodUserList: Array<UserModel>): boolean {
+    const isAlreadyGood = (goodUserList: Array<UserModel>): boolean => {
       return goodUserList.some((user: UserModel) => {
         return user.id === state.userId;
       });
-    }
+    };
 
-    function getMyGood(userId: string, triviaId: string): number {
+    const getMyGood = (userId: string, triviaId: string): number => {
       const good: GoodModel | undefined = goodList.value.find((good) => {
         return good.user === userId && good.trivia === triviaId;
       });
@@ -81,30 +81,29 @@ export default defineComponent({
         return good.id;
       }
       return 0;
-    }
+    };
 
-    function clickGood(
-      isGood: boolean,
-      id: string,
-      goodUserList?: Array<UserModel>
-    ): void {
+    const clickGood = (isGood: boolean, id: string, goodUserList?: Array<UserModel>): void => {
       const data = {
         user: state.userId,
         trivia: id,
       };
       const headers = {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         Authorization: `JWT ${store.getters.getToken}`,
       };
       if (isGood) {
         axios
-          .post("api/goods/", data, {
+          .post('api/goods/', data, {
             headers: headers,
           })
           .then((resp) => {
             //ユーザのいいね一覧取得
             store.dispatch(ActionTypes.GOOD);
-            emit("get-trivia-list");
+            emit('get-trivia-list');
+          })
+          .catch((err) => {
+            console.error(err);
           });
       } else {
         axios
@@ -114,10 +113,13 @@ export default defineComponent({
           .then((resp) => {
             //ユーザのいいね一覧取得
             store.dispatch(ActionTypes.GOOD);
-            emit("get-trivia-list");
+            emit('get-trivia-list');
+          })
+          .catch((err) => {
+            console.error(err);
           });
       }
-    }
+    };
     return { clickContent, clickGood, isAlreadyGood };
   },
 });

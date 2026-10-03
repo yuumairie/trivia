@@ -28,9 +28,11 @@ paths:
         '200':
           description: A JSON array of Trivia model
           content:
-            apllication/json:
+            application/json:
               schema: 
                 type: array
+                items:
+                  $ref: '#/components/schemas/Trivia'
     post:
       tags: 
         - trivias
@@ -51,12 +53,16 @@ paths:
       responses:
         "200":
           description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trivia'
       security:
         - bearer: []
   /users:
     post:
       tags:
-        - /users
+        - users
       description: ユーザを登録します
       requestBody:
         content:
@@ -73,8 +79,50 @@ paths:
       responses:
         "200":
           description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
 components:
   securitySchemes:
     bearer:
       type: http
       scheme: bearer
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        username:
+          type: string
+    Genre:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    Trivia:
+      type: object
+      properties:
+        id:
+          type: integer
+        userPost:
+          $ref: '#/components/schemas/User'
+        genre:
+          $ref: '#/components/schemas/Genre'
+        content:
+          type: string
+        explanation:
+          type: string
+        created_at:
+          type: string
+          description: "フォーマット: yyyy/mm/dd"
+        good:
+          type: array
+          description: "この投稿をいいねしたユーザー一覧"
+          items:
+            $ref: '#/components/schemas/User'

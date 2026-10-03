@@ -1,8 +1,6 @@
 <template>
   <div class="login-page">
-    <label
-      style="font-size:24px;background: linear-gradient(transparent 50%, #a8eaff 50%);"
-    >
+    <label style="font-size: 24px; background: linear-gradient(transparent 50%, #a8eaff 50%)">
       ログイン
     </label>
     <br /><br />
@@ -31,21 +29,21 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive } from "vue";
-import { useStore, ActionTypes } from "../store";
-import { useRouter } from "../router";
+import { defineComponent, reactive } from 'vue';
+import { useStore, ActionTypes } from '../store';
+import { useRouter } from '../router';
 
 export default defineComponent({
   setup() {
     const state = reactive({
-      name: "",
-      email: "",
-      password: "",
-      message: "",
+      name: '',
+      email: '',
+      password: '',
+      message: '',
     });
 
     //ログイン
-    function login() {
+    const login = () => {
       const store = useStore();
       const router = useRouter();
       const data = {
@@ -58,14 +56,14 @@ export default defineComponent({
         .dispatch(ActionTypes.LOGIN, data)
         .then((resp) => {
           //ユーザのいいね一覧取得
-          store.dispatch(ActionTypes.GOOD)
+          store.dispatch(ActionTypes.GOOD);
           //ホーム画面へ移動
-          router.push("home");
+          router.push('home');
         })
         .catch(() => {
-          state.message = "メールアドレスかパスワードが違います。";
+          state.message = 'メールアドレスかパスワードが違います。';
         });
-    }
+    };
     return { state, login };
   },
 });
@@ -84,6 +82,6 @@ input {
 .info {
   border: black 2px dashed;
   width: 64%;
-  margin:auto;
+  margin: auto;
 }
 </style>

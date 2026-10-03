@@ -6,14 +6,19 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('api', '0003_auto_20201208_2159'),
-    ]
+  dependencies = [
+    ('api', '0003_auto_20201208_2159'),
+  ]
 
-    operations = [
-        migrations.AlterField(
-            model_name='trivia',
-            name='good',
-            field=models.ManyToManyField(related_name='related_to', through='api.Good', to=settings.AUTH_USER_MODEL, verbose_name='好ユーザリスト'),
-        ),
-    ]
+  operations = [
+    migrations.AlterField(
+      model_name='trivia',
+      name='good',
+      field=models.ManyToManyField(
+        related_name='related_to',
+        through='api.Good',
+        to=settings.AUTH_USER_MODEL,
+        verbose_name='好ユーザリスト',
+      ),
+    ),
+  ]

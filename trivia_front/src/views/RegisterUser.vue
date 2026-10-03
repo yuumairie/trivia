@@ -1,8 +1,6 @@
 <template>
   <div class="register-page">
-    <label
-      style="font-size:24px;background: linear-gradient(transparent 50%, #a8eaff 50%);"
-    >
+    <label style="font-size: 24px; background: linear-gradient(transparent 50%, #a8eaff 50%)">
       アカウント情報を入力
     </label>
     <br />
@@ -35,36 +33,46 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive } from "vue";
-import { useStore, ActionTypes } from "../store";
-import { useRouter } from "../router";
-import axios from "axios";
+import { defineComponent, reactive } from 'vue';
+import { useStore, ActionTypes } from '../store';
+import { useRouter } from '../router';
+import axios from 'axios';
 export default defineComponent({
   setup() {
     const state = reactive({
-      name: "",
-      email: "",
-      password: "",
+      name: '',
+      email: '',
+      password: '',
     });
 
     //アカウント作成関数
-    function create() {
+    const create = () => {
       const store = useStore();
       const router = useRouter();
       const data = {
         email: state.email,
         password: state.password,
-        username: state.name
+        username: state.name,
       };
       //アカウント作成
-      axios.post("/api/register/", data).then(() => {
-        //jwt取得
-        store.dispatch(ActionTypes.LOGIN, data).then(() => {
-          //ホーム画面へ移動
-          router.push("home");
+      axios
+        .post('/api/register/', data)
+        .then(() => {
+          //jwt取得
+          store
+            .dispatch(ActionTypes.LOGIN, data)
+            .then(() => {
+              //ホーム画面へ移動
+              router.push('home');
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        })
+        .catch((err) => {
+          console.error(err);
         });
-      });
-    }
+    };
     return { state, create };
   },
 });

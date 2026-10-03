@@ -3,12 +3,9 @@
     <div class="trivia-genre">
       <label for="genre">ジャンル</label>
       <select id="genre" v-model="state.genreId">
-        <option
-          v-for="genre in state.genreList"
-          :key="genre.id"
-          :value="genre.id"
-          >{{ genre.name }}</option
-        >
+        <option v-for="genre in state.genreList" :key="genre.id" :value="genre.id">
+          {{ genre.name }}
+        </option>
       </select>
     </div>
     <div class="trivia-content">
@@ -26,19 +23,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, computed, onMounted } from "vue";
-import { useStore } from "../store";
-import { useRouter } from "../router";
-import axios from "axios";
+import { defineComponent, reactive, computed, onMounted } from 'vue';
+import { GenreModel } from '../types/task';
+import { useStore } from '../store';
+import { useRouter } from '../router';
+import axios from 'axios';
 export default defineComponent({
   setup() {
     const store = useStore();
     const router = useRouter();
     const state = reactive({
-      genreList: [],
-      genreId: "",
-      triviaContent: "",
-      triviaExplanation: "",
+      genreList: [] as GenreModel[],
+      genreId: '',
+      triviaContent: '',
+      triviaExplanation: '',
     });
 
     //JWT
@@ -46,30 +44,38 @@ export default defineComponent({
       return store.getters.getToken;
     });
     onMounted(() => {
-      axios.get("/api/genres/").then((req) => {
-        state.genreList = req.data;
-      });
+      axios
+        .get('/api/genres/')
+        .then((req) => {
+          state.genreList = req.data;
+        })
+        .catch((err) => {
+          console.error(err);
+        });
     });
     //投稿関数
-    function post() {
+    const post = () => {
       const data = {
         genre: state.genreId,
         content: state.triviaContent,
         explanation: state.triviaExplanation,
       };
       const headers = {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         Authorization: `JWT ${jwt.value}`,
       };
 
       axios
-        .post("/api/trivias/", data, {
+        .post('/api/trivias/', data, {
           headers: headers,
         })
         .then((req) => {
           router.push(`/detail/${req.data.id}`);
+        })
+        .catch((err) => {
+          console.error(err);
         });
-    }
+    };
     return { state, post };
   },
 });

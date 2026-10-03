@@ -3,6 +3,11 @@ export interface UserModel {
   username: string;
 }
 
+export interface GenreModel {
+  id: number;
+  name: string;
+}
+
 export interface TriviaModel {
   id: number;
   userPost: {
@@ -16,7 +21,7 @@ export interface TriviaModel {
   content?: string;
   created_at?: string;
   explanation?: string;
-  good?: Array<UserModel>
+  good?: Array<UserModel>;
 }
 
 export interface GoodModel {
@@ -24,6 +29,3 @@ export interface GoodModel {
   user: string;
   trivia: string;
 }
-
-
-

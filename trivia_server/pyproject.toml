@@ -1,0 +1,5 @@
+# Black (Python auto-formatter) is not used in this project: Black's
+# indentation is fixed at 4 spaces and cannot be configured to match this
+# project's 2-space convention. autopep8 is used instead (see
+# requirements-dev.txt / .devcontainer/devcontainer.json), configured with
+# --indent-size=2. See README.md for usage.
