@@ -4,11 +4,11 @@
 
 ## 構成
 
-| ディレクトリ | 役割 | 技術スタック |
-|---|---|---|
+| ディレクトリ   | 役割            | 技術スタック                                              |
+| -------------- | --------------- | --------------------------------------------------------- |
 | `haiku_server` | バックエンドAPI | Python 3.8 / Django 3.1 / Django REST Framework / JWT認証 |
-| `haiku_front` | フロントエンド | Vue.js 3 / TypeScript / Vuex / Vue Router |
-| `haiku_api` | API仕様書 | OpenAPI 3.0（参考資料、単体では動作しません） |
+| `haiku_front`  | フロントエンド  | Vue.js 3 / TypeScript / Vuex / Vue Router                 |
+| `haiku_api`    | API仕様書       | OpenAPI 3.0（参考資料、単体では動作しません）             |
 
 `docker-compose.yml` は `haiku_server` と `haiku_front` を1つのコンテナ（`dev`）にまとめて起動します。バックエンド（ポート8000）とフロントエンド（ポート8080）の開発サーバーが同じコンテナの中で両方動きます。
 
@@ -37,7 +37,6 @@
    初回はPython/Node両方の依存関係をインストールするのでビルドに数分かかります。起動時に自動でバックエンドのマイグレーション（`migrate`）も実行されます。
 
 3. アクセス先
-
    - フロントエンド: http://localhost:8080
    - バックエンドAPI: http://localhost:8000
    - Django管理画面: http://localhost:8000/admin/（利用するにはsuperuserの作成が必要、下記参照）
@@ -145,7 +144,7 @@ docker compose exec dev python haiku_server/manage.py createsuperuser
 
 `haiku_api/openapi.yaml` から、[OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator) の公式Dockerイメージ（`openapitools/openapi-generator-cli`）を使ってクライアントコードなどを自動生成できます。Java等をローカルに用意する必要はありません。
 
-プロジェクトルート直下で実行してください（フォルダ名は技術的な事情で今も`trivia`のままです）。
+プロジェクトルート直下で実行してください。
 
 TypeScript（フロントエンド用のaxiosクライアント）:
 
