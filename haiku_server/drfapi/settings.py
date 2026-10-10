@@ -118,9 +118,9 @@ SIMPLE_JWT = {
 DATABASES = {
   'default': {
     'ENGINE': 'django.db.backends.mysql',
-    'NAME': os.environ.get('DB_NAME', 'trivia'),
-    'USER': os.environ.get('DB_USER', 'trivia'),
-    'PASSWORD': os.environ.get('DB_PASSWORD', 'trivia'),
+    'NAME': os.environ.get('DB_NAME', 'haiku'),
+    'USER': os.environ.get('DB_USER', 'haiku'),
+    'PASSWORD': os.environ.get('DB_PASSWORD', 'haiku'),
     'HOST': os.environ.get('DB_HOST', 'db'),
     'PORT': os.environ.get('DB_PORT', '3306'),
   }
